@@ -15,6 +15,12 @@ add_definitions(
 include_directories(${LLVM_INCLUDE_DIRS})
 
 set(SOURCES
+	ast.h
+	lex.h
+	parse.h
+	debug.h
+	codegen.h
+	dispatch.h
   toy.cpp
 )
 
