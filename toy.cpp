@@ -24,6 +24,26 @@
 #include <vector>
 using namespace llvm;
 
+size_t program_strpos = 0;
+std::string program =
+  "extern printd(x)"
+  "def fib(x)\n"
+  "  if x < 3 then\n"
+  "    1\n"
+  "  else\n"
+  "    fib(x-1)+fib(x-2)\n"
+  "\n"
+  "fib(40)"
+;
+
+char get_prog_char()
+{
+  char c = program[program_strpos];
+  program_strpos++;
+  return c;
+}
+
+
 //===----------------------------------------------------------------------===//
 // Lexer
 //===----------------------------------------------------------------------===//
@@ -113,7 +133,7 @@ static SourceLocation CurLoc;
 static SourceLocation LexLoc = { 1, 0 };
 
 static int advance() {
-  int LastChar = getchar();
+  int LastChar = get_prog_char();
 
   if (LastChar == '\n' || LastChar == '\r') {
     LexLoc.Line++;
@@ -833,8 +853,8 @@ void DebugInfo::emitLocation(ExprAST *AST) {
     Scope = TheCU;
   else
     Scope = LexicalBlocks.back();
-//  Builder.SetCurrentDebugLocation(
-//      DebugLoc::get(AST->getLine(), AST->getCol(), Scope));
+  Builder.SetCurrentDebugLocation(
+      DebugLoc::get(AST->getLine(), AST->getCol(), *Scope));
 }
 
 static DISubroutineType *CreateFunctionType(unsigned NumArgs, DIFile *Unit) {
@@ -842,10 +862,10 @@ static DISubroutineType *CreateFunctionType(unsigned NumArgs, DIFile *Unit) {
   DIType *DblTy = KSDbgInfo.getDoubleTy();
 
   // Add the result type.
-  //EltTys.push_back(DblTy);
+  EltTys.push_back(*DblTy);
 
-  //for (unsigned i = 0, e = NumArgs; i != e; ++i)
-//    EltTys.push_back(DblTy);
+  for (unsigned i = 0, e = NumArgs; i != e; ++i)
+    EltTys.push_back(*DblTy);
 
   DISubroutineType* dt = new DISubroutineType;
   *dt = DBuilder->createSubroutineType(*Unit,
@@ -1204,12 +1224,16 @@ Function *PrototypeAST::Codegen() {
   Function *F =
       Function::Create(FT, Function::ExternalLinkage, Name, TheModule);
 
+  printf("Func name: %s\n", Name.c_str() );
+  fflush(stdout);
+
   // If F conflicted, there was already something named 'Name'.  If it has a
   // body, don't allow redefinition or reextern.
   if (F->getName() != Name) {
     // Delete the one we just made and get the existing one.
     F->eraseFromParent();
     F = TheModule->getFunction(Name);
+
 
     // If F already has a body, reject this.
     if (!F->empty()) {
@@ -1377,7 +1401,7 @@ static void HandleTopLevelExpression() {
   // Evaluate a top-level expression into an anonymous function.
   if (FunctionAST *F = ParseTopLevelExpr()) {
     if (!F->Codegen()) {
-      fprintf(stderr, "Error generating code for top level expr");
+      fprintf(stderr, "Error generating code for top level expr\n");
     }
   } else {
     // Skip token for error recovery.
@@ -1462,6 +1486,7 @@ int main() {
   // Create the compile unit for the module.
   // Currently down as "fib.ks" as a filename since we're redirecting stdin
   // but we'd like actual source locations.
+  KSDbgInfo.TheCU = new DICompileUnit();
   *KSDbgInfo.TheCU = DBuilder->createCompileUnit(
       dwarf::DW_LANG_C, "fib.ks", ".", "Kaleidoscope Compiler", 0, "", 0);
 
@@ -1470,7 +1495,7 @@ int main() {
   TheExecutionEngine =
       EngineBuilder(std::move(Owner))
           .setErrorStr(&ErrStr)
-          .setMCJITMemoryManager(llvm::make_unique<SectionMemoryManager>())
+          //.setMCJITMemoryManager(llvm::make_unique<SectionMemoryManager>())
           .create();
   if (!TheExecutionEngine) {
     fprintf(stderr, "Could not create ExecutionEngine: %s\n", ErrStr.c_str());
