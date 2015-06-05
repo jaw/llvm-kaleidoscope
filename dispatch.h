@@ -3,8 +3,6 @@
 // Top-Level parsing and JIT Driver
 //===----------------------------------------------------------------------===//
 
-static ExecutionEngine *TheExecutionEngine;
-
 static void HandleDefinition() {
   if (FunctionAST *F = ParseDefinition()) {
     if (!F->Codegen()) {

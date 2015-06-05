@@ -1,38 +1,53 @@
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/Triple.h"
+#include "llvm/Analysis/Passes.h"
+#include "llvm/ExecutionEngine/ExecutionEngine.h"
+#include "llvm/ExecutionEngine/MCJIT.h"
+#include "llvm/ExecutionEngine/SectionMemoryManager.h"
+#include "llvm/IR/DIBuilder.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/DebugInfo.h"
+#include "llvm/IR/IRBuilder.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/LegacyPassManager.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Verifier.h"
+#include "llvm/Support/Host.h"
+#include "llvm/Support/TargetSelect.h"
+#include "llvm/Transforms/Scalar.h"
+
+#include "debuginfo/debuginfo_manager.h"
+
 //===----------------------------------------------------------------------===//
 // Code Generation
 //===----------------------------------------------------------------------===//
 
-static Module *TheModule;
-static std::map<std::string, AllocaInst *> NamedValues;
-static legacy::FunctionPassManager *TheFPM;
 
-Value *ErrorV(const char *Str) {
+Value *ErrorV(const char *Str)
+{
   Error(Str);
   return 0;
 }
 
 /// CreateEntryBlockAlloca - Create an alloca instruction in the entry block of
 /// the function.  This is used for mutable variables etc.
-static AllocaInst *CreateEntryBlockAlloca(Function *TheFunction,
-                                          const std::string &VarName) {
+static llvm::AllocaInst *CreateEntryBlockAlloca(Function *TheFunction,
+                                          const std::string &VarName)
+{
   IRBuilder<> TmpB(&TheFunction->getEntryBlock(),
                    TheFunction->getEntryBlock().begin());
   return TmpB.CreateAlloca(Type::getDoubleTy(getGlobalContext()), 0,
                            VarName.c_str());
 }
 
-Value *NumberExprAST::Codegen() {
-  KSDbgInfo.emitLocation(this);
-  return ConstantFP::get(getGlobalContext(), APFloat(Val));
-}
-
-Value *VariableExprAST::Codegen() {
+llvm::Value *VariableExprAST::Codegen() {
   // Look this variable up in the function.
   Value *V = NamedValues[Name];
   if (V == 0)
     return ErrorV("Unknown variable name");
 
-  KSDbgInfo.emitLocation(this);
+  debug_manager::get_instance()->emitLocation(this);
   // Load the value.
   return Builder.CreateLoad(V, Name.c_str());
 }
@@ -46,12 +61,12 @@ Value *UnaryExprAST::Codegen() {
   if (F == 0)
     return ErrorV("Unknown unary operator");
 
-  KSDbgInfo.emitLocation(this);
+  debug_manager::get_instance()->emitLocation(this);
   return Builder.CreateCall(F, OperandV, "unop");
 }
 
 Value *BinaryExprAST::Codegen() {
-  KSDbgInfo.emitLocation(this);
+  debug_manager::get_instance()->emitLocation(this);
 
   // Special case '=' because we don't want to emit the LHS as an expression.
   if (Op == '=') {
@@ -107,10 +122,10 @@ Value *BinaryExprAST::Codegen() {
 }
 
 Value *CallExprAST::Codegen() {
-  KSDbgInfo.emitLocation(this);
+  debug_manager::get_instance()->emitLocation(this);
 
   // Look up the name in the global module table.
-  Function *CalleeF = TheModule->getFunction(Callee);
+  Function *CalleeF = TheModule->getFunction( std::string(Callee.c_str()) );
   if (CalleeF == 0)
     return ErrorV("Unknown function referenced");
 
@@ -129,7 +144,7 @@ Value *CallExprAST::Codegen() {
 }
 
 Value *IfExprAST::Codegen() {
-  KSDbgInfo.emitLocation(this);
+  debug_manager::get_instance()->emitLocation(this);
 
   Value *CondV = Cond->Codegen();
   if (CondV == 0)
@@ -208,9 +223,9 @@ Value *ForExprAST::Codegen() {
   Function *TheFunction = Builder.GetInsertBlock()->getParent();
 
   // Create an alloca for the variable in the entry block.
-  AllocaInst *Alloca = CreateEntryBlockAlloca(TheFunction, VarName);
+  AllocaInst *Alloca = CreateEntryBlockAlloca(TheFunction, std::string(VarName.c_str()));
 
-  KSDbgInfo.emitLocation(this);
+  debug_manager::get_instance()->emitLocation(this);
 
   // Emit the start code first, without 'variable' in scope.
   Value *StartVal = Start->Codegen();
@@ -295,7 +310,7 @@ Value *VarExprAST::Codegen() {
 
   // Register all variables and emit their initializer.
   for (unsigned i = 0, e = VarNames.size(); i != e; ++i) {
-    const std::string &VarName = VarNames[i].first;
+    const vsx_string<> &VarName = VarNames[i].first;
     ExprAST *Init = VarNames[i].second;
 
     // Emit the initializer before adding the variable to scope, this prevents
@@ -312,7 +327,7 @@ Value *VarExprAST::Codegen() {
       InitVal = ConstantFP::get(getGlobalContext(), APFloat(0.0));
     }
 
-    AllocaInst *Alloca = CreateEntryBlockAlloca(TheFunction, VarName);
+    AllocaInst *Alloca = CreateEntryBlockAlloca(TheFunction, std::string(VarName.c_str()) );
     Builder.CreateStore(InitVal, Alloca);
 
     // Remember the old variable binding so that we can restore the binding when
@@ -323,7 +338,7 @@ Value *VarExprAST::Codegen() {
     NamedValues[VarName] = Alloca;
   }
 
-  KSDbgInfo.emitLocation(this);
+  debug_manager::get_instance()->emitLocation(this);
 
   // Codegen the body, now that all vars are in scope.
   Value *BodyVal = Body->Codegen();
@@ -346,17 +361,17 @@ Function *PrototypeAST::Codegen() {
       FunctionType::get(Type::getDoubleTy(getGlobalContext()), Doubles, false);
 
   Function *F =
-      Function::Create(FT, Function::ExternalLinkage, Name, TheModule);
+      Function::Create(FT, Function::ExternalLinkage, std::string(Name.c_str()), TheModule);
 
   printf("Func name: %s\n", Name.c_str() );
   fflush(stdout);
 
   // If F conflicted, there was already something named 'Name'.  If it has a
   // body, don't allow redefinition or reextern.
-  if (F->getName() != Name) {
+  if (F->getName() != std::string(Name.c_str())) {
     // Delete the one we just made and get the existing one.
     F->eraseFromParent();
-    F = TheModule->getFunction(Name);
+    F = TheModule->getFunction(Name.c_str());
 
 
     // If F already has a body, reject this.
@@ -376,22 +391,24 @@ Function *PrototypeAST::Codegen() {
   unsigned Idx = 0;
   for (Function::arg_iterator AI = F->arg_begin(); Idx != Args.size();
        ++AI, ++Idx)
-    AI->setName(Args[Idx]);
+    AI->setName(Args[Idx].c_str());
 
   // Create a subprogram DIE for this function.
-  DIFile Unit = DBuilder->createFile(KSDbgInfo.TheCU->getFilename(),
-                                      KSDbgInfo.TheCU->getDirectory());
+  DIFile Unit = DBuilder->createFile(
+    debug_manager::get_instance()->getCU()->getFilename(),
+    debug_manager::get_instance()->getCU()->getDirectory()
+  );
   //DIScope *FContext = Unit;
   unsigned LineNo = Line;
   unsigned ScopeLine = Line;
   DISubprogram* SP = new DISubprogram;
   *SP = DBuilder->createFunction(
       Unit, // ok
-      Name, // ok
+      Name.c_str(), // ok
       StringRef(), // ok
       Unit, // ok
       LineNo, // ok
-      *CreateFunctionType(Args.size(), &Unit), // ok
+      *debug_manager::get_instance()->CreateFunctionType(Args.size(), &Unit), // ok
       false /* internal linkage */,
       true /* definition */,
       ScopeLine,
@@ -400,7 +417,7 @@ Function *PrototypeAST::Codegen() {
       F
     );
 
-  KSDbgInfo.FnScopeMap[this] = SP;
+  debug_manager::get_instance()->addFunctionScopeMap(this, SP);
   return F;
 }
 
@@ -410,13 +427,15 @@ void PrototypeAST::CreateArgumentAllocas(Function *F) {
   Function::arg_iterator AI = F->arg_begin();
   for (unsigned Idx = 0, e = Args.size(); Idx != e; ++Idx, ++AI) {
     // Create an alloca for this variable.
-    AllocaInst *Alloca = CreateEntryBlockAlloca(F, Args[Idx]);
+    AllocaInst *Alloca = CreateEntryBlockAlloca(F, Args[Idx].c_str() );
 
     // Create a debug descriptor for the variable.
     DIScope *Scope = KSDbgInfo.LexicalBlocks.back();
 
-    auto Unit = DBuilder->createFile(KSDbgInfo.TheCU->getFilename(),
-                                        KSDbgInfo.TheCU->getDirectory());
+    auto Unit = DBuilder->createFile(
+          debug_manager::get_instance()->getCU()->getFilename(),
+          debug_manager::get_instance()->getCU()->getDirectory()
+        );
     auto D = DBuilder->createLocalVariable(
         dwarf::DW_TAG_arg_variable, *Scope, Args[Idx], Unit, Line,
         *KSDbgInfo.getDoubleTy(), Idx);

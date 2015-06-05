@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+   <FileVersion major="1" minor="6" />
+   <Project>
+      <Option title="Project" />
+      <Option makefile_is_custom="1" />
+      <Option compiler="gcc" />
+      <Option virtualFolders="CMake Files\;CMake Files\..\;CMake Files\..\..\;CMake Files\..\..\..\;CMake Files\..\..\..\..\;CMake Files\..\..\..\..\usr\;CMake Files\..\..\..\..\usr\share\;CMake Files\..\..\..\..\usr\share\llvm-3.6\;CMake Files\..\..\..\..\usr\share\llvm-3.6\cmake\;" />
+      <Build>
+      <Target title="all">
+         <Option working_dir="/home/jonatanw/workspace/language/build" />
+         <Option type="4" />
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/jonatanw/workspace/language/build/Makefile&quot;  VERBOSE=1 all" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/jonatanw/workspace/language/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/jonatanw/workspace/language/build/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/jonatanw/workspace/language/build/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="rebuild_cache">
+         <Option working_dir="/home/jonatanw/workspace/language/build" />
+         <Option type="4" />
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/jonatanw/workspace/language/build/Makefile&quot;  VERBOSE=1 rebuild_cache" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/jonatanw/workspace/language/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/jonatanw/workspace/language/build/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/jonatanw/workspace/language/build/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="toy">
+         <Option output="/home/jonatanw/workspace/language/build/toy" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/jonatanw/workspace/language/build" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-D__STDC_LIMIT_MACROS" />
+            <Add option="-D__STDC_CONSTANT_MACROS" />
+            <Add directory="/home/jonatanw/workspace/language" />
+            <Add directory="/home/jonatanw/workspace/language/vsxu" />
+            <Add directory="/home/jonatanw/workspace/language/vsxu/container" />
+            <Add directory="/home/jonatanw/workspace/language/vsxu/debug" />
+            <Add directory="/home/jonatanw/workspace/language/vsxu/string" />
+            <Add directory="/home/jonatanw/workspace/language/vsxu/tools" />
+            <Add directory="/usr/lib/llvm-3.6/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/jonatanw/workspace/language/build/Makefile&quot;  VERBOSE=1 toy" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/jonatanw/workspace/language/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/jonatanw/workspace/language/build/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/jonatanw/workspace/language/build/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="toy/fast">
+         <Option output="/home/jonatanw/workspace/language/build/toy" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/jonatanw/workspace/language/build" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-D__STDC_LIMIT_MACROS" />
+            <Add option="-D__STDC_CONSTANT_MACROS" />
+            <Add directory="/home/jonatanw/workspace/language" />
+            <Add directory="/home/jonatanw/workspace/language/vsxu" />
+            <Add directory="/home/jonatanw/workspace/language/vsxu/container" />
+            <Add directory="/home/jonatanw/workspace/language/vsxu/debug" />
+            <Add directory="/home/jonatanw/workspace/language/vsxu/string" />
+            <Add directory="/home/jonatanw/workspace/language/vsxu/tools" />
+            <Add directory="/usr/lib/llvm-3.6/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/jonatanw/workspace/language/build/Makefile&quot;  VERBOSE=1 toy/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/jonatanw/workspace/language/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/jonatanw/workspace/language/build/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/jonatanw/workspace/language/build/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      </Build>
+      <Unit filename="/home/jonatanw/workspace/language/debuginfo/debuginfo_manager.cpp">
+      </Unit>
+      <Unit filename="/home/jonatanw/workspace/language/producer.cpp">
+      </Unit>
+      <Unit filename="/home/jonatanw/workspace/language/toy.cpp">
+      </Unit>
+      <Unit filename="/home/jonatanw/workspace/language/ast/ast.h">
+      </Unit>
+      <Unit filename="/home/jonatanw/workspace/language/ast/ast_abs.h">
+      </Unit>
+      <Unit filename="/home/jonatanw/workspace/language/ast/ast_expr.h">
+      </Unit>
+      <Unit filename="/home/jonatanw/workspace/language/ast/ast_parse.h">
+      </Unit>
+      <Unit filename="/home/jonatanw/workspace/language/binop_precedence.h">
+      </Unit>
+      <Unit filename="/home/jonatanw/workspace/language/codegen.h">
+      </Unit>
+      <Unit filename="/home/jonatanw/workspace/language/debuginfo/debuginfo.h">
+      </Unit>
+      <Unit filename="/home/jonatanw/workspace/language/debuginfo/debuginfo_abs.h">
+      </Unit>
+      <Unit filename="/home/jonatanw/workspace/language/debuginfo/debuginfo_manager.h">
+      </Unit>
+      <Unit filename="/home/jonatanw/workspace/language/dispatch.h">
+      </Unit>
+      <Unit filename="/home/jonatanw/workspace/language/error.h">
+      </Unit>
+      <Unit filename="/home/jonatanw/workspace/language/lex.h">
+      </Unit>
+      <Unit filename="/home/jonatanw/workspace/language/parse.h">
+      </Unit>
+      <Unit filename="/home/jonatanw/workspace/language/producer.h">
+      </Unit>
+      <Unit filename="/home/jonatanw/workspace/language/vsxu/string/vsx_string.h">
+      </Unit>
+      <Unit filename="/home/jonatanw/workspace/language/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\" />
+      </Unit>
+      <Unit filename="/home/jonatanw/workspace/language/../../../../usr/share/llvm-3.6/cmake/LLVMConfigVersion.cmake">
+          <Option virtualFolder="CMake Files\..\..\..\..\usr\share\llvm-3.6\cmake\" />
+      </Unit>
+      <Unit filename="/home/jonatanw/workspace/language/../../../../usr/share/llvm-3.6/cmake/LLVMConfig.cmake">
+          <Option virtualFolder="CMake Files\..\..\..\..\usr\share\llvm-3.6\cmake\" />
+      </Unit>
+      <Unit filename="/home/jonatanw/workspace/language/../../../../usr/share/llvm-3.6/cmake/LLVMExports.cmake">
+          <Option virtualFolder="CMake Files\..\..\..\..\usr\share\llvm-3.6\cmake\" />
+      </Unit>
+      <Unit filename="/home/jonatanw/workspace/language/../../../../usr/share/llvm-3.6/cmake/LLVM-Config.cmake">
+          <Option virtualFolder="CMake Files\..\..\..\..\usr\share\llvm-3.6\cmake\" />
+      </Unit>
+   </Project>
+</CodeBlocks_project_file>

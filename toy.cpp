@@ -22,32 +22,24 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <vsx_string.h>
 
 using namespace llvm;
 
-size_t program_strpos = 0;
-std::string program =
-  "extern printd(x)"
-  "def fib(x)\n"
-  "  if x < 3 then\n"
-  "    1\n"
-  "  else\n"
-  "    fib(x-1)+fib(x-2)\n"
-  "\n"
-  "fib(40)"
-;
-
-char get_prog_char()
-{
-  char c = program[program_strpos];
-  program_strpos++;
-  return c;
-}
+static llvm::ExecutionEngine *TheExecutionEngine;
+static llvm::DIBuilder *DBuilder;
+static llvm::Module *TheModule;
+static std::map<vsx_string<>, llvm::AllocaInst *> NamedValues;
+static llvm::legacy::FunctionPassManager *TheFPM;
+static llvm::IRBuilder<> Builder(llvm::getGlobalContext());
 
 #include "lex.h"
-#include "ast.h"
-#include "debug.h"
 #include "parse.h"
+#include "ast/ast_abs.h"
+#include "ast/ast.h"
+#include "error.h"
+#include "debuginfo/debuginfo_manager.h"
+#include "ast/ast_parse.h"
 #include "codegen.h"
 #include "dispatch.h"
 
@@ -76,14 +68,6 @@ int main() {
   InitializeNativeTargetAsmPrinter();
   InitializeNativeTargetAsmParser();
   LLVMContext &Context = getGlobalContext();
-
-  // Install standard binary operators.
-  // 1 is lowest precedence.
-  BinopPrecedence['='] = 2;
-  BinopPrecedence['<'] = 10;
-  BinopPrecedence['+'] = 20;
-  BinopPrecedence['-'] = 20;
-  BinopPrecedence['*'] = 40; // highest.
 
   // Prime the first token.
   getNextToken();
