@@ -3,7 +3,7 @@
 
 #include "llvm_includes.h"
 #include "debuginfo_abs.h"
-#include "ast/ast_abs.h"
+#include "ast/ast_function_prototype.h"
 #include "ast/ast_expr.h"
 #include "builder_manager.h"
 
@@ -15,7 +15,7 @@ class debug_info
   llvm::DICompileUnit *TheCU;
   llvm::DIType DblTy;
   std::vector<llvm::DIScope *> LexicalBlocks;
-  std::map< const PrototypeAST *, llvm::DIScope *> FnScopeMap;
+  std::map< const ast_function_prototype *, llvm::DIScope *> FnScopeMap;
 
 public:
 
@@ -33,14 +33,14 @@ public:
 
   void addFunctionScopeMap(void* proto, llvm::DIScope* scope)
   {
-    PrototypeAST* p = static_cast<PrototypeAST*>(proto);
+    ast_function_prototype* p = static_cast<ast_function_prototype*>(proto);
     if (p)
       FnScopeMap[p] = scope;
   }
 
   void addFunctionScopeToLexicalBlocks(void* proto)
   {
-    PrototypeAST* p = static_cast<PrototypeAST*>(proto);
+    ast_function_prototype* p = static_cast<ast_function_prototype*>(proto);
     if (p)
       LexicalBlocks.push_back(FnScopeMap[p]);
   }
@@ -50,7 +50,7 @@ public:
     if (!AST)
       return builder_manager::get_instance()->get_ir()->SetCurrentDebugLocation(DebugLoc());
 
-    ExprAST* pAST = static_cast<ExprAST*>(AST);
+    ast_expr* pAST = static_cast<ast_expr*>(AST);
 
 
     DIScope *Scope;

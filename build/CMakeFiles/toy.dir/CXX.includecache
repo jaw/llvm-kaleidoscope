@@ -57,8 +57,44 @@ ast_expr.h
 /home/jonatanw/workspace/language/ast/ast_expr.h
 named_values.h
 /home/jonatanw/workspace/language/ast/named_values.h
+ast_number_expr.h
+/home/jonatanw/workspace/language/ast/ast_number_expr.h
+ast_variable_expr.h
+/home/jonatanw/workspace/language/ast/ast_variable_expr.h
+ast_unary_expr.h
+/home/jonatanw/workspace/language/ast/ast_unary_expr.h
+ast_binary_expr.h
+/home/jonatanw/workspace/language/ast/ast_binary_expr.h
+ast_call_expr.h
+/home/jonatanw/workspace/language/ast/ast_call_expr.h
+ast_if_expr.h
+/home/jonatanw/workspace/language/ast/ast_if_expr.h
+ast_for_expr.h
+/home/jonatanw/workspace/language/ast/ast_for_expr.h
+ast_var_expr.h
+/home/jonatanw/workspace/language/ast/ast_var_expr.h
+ast_function.h
+/home/jonatanw/workspace/language/ast/ast_function.h
 
-/home/jonatanw/workspace/language/ast/ast_abs.h
+/home/jonatanw/workspace/language/ast/ast_binary_expr.h
+
+/home/jonatanw/workspace/language/ast/ast_call_expr.h
+
+/home/jonatanw/workspace/language/ast/ast_expr.h
+llvm_includes.h
+/home/jonatanw/workspace/language/ast/llvm_includes.h
+parser.h
+/home/jonatanw/workspace/language/ast/parser.h
+
+/home/jonatanw/workspace/language/ast/ast_for_expr.h
+
+/home/jonatanw/workspace/language/ast/ast_function.h
+ast_function_prototype.h
+/home/jonatanw/workspace/language/ast/ast_function_prototype.h
+ast_expr.h
+/home/jonatanw/workspace/language/ast/ast_expr.h
+
+/home/jonatanw/workspace/language/ast/ast_function_prototype.h
 llvm_includes.h
 /home/jonatanw/workspace/language/ast/llvm_includes.h
 llvm_helper.h
@@ -73,16 +109,24 @@ source_location.h
 /home/jonatanw/workspace/language/ast/source_location.h
 error.h
 /home/jonatanw/workspace/language/ast/error.h
+parser.h
+/home/jonatanw/workspace/language/ast/parser.h
 debuginfo/debuginfo_manager.h
 /home/jonatanw/workspace/language/ast/debuginfo/debuginfo_manager.h
 
-/home/jonatanw/workspace/language/ast/ast_expr.h
-llvm_includes.h
-/home/jonatanw/workspace/language/ast/llvm_includes.h
-parse.h
-/home/jonatanw/workspace/language/ast/parse.h
+/home/jonatanw/workspace/language/ast/ast_if_expr.h
+
+/home/jonatanw/workspace/language/ast/ast_number_expr.h
 
 /home/jonatanw/workspace/language/ast/ast_parse.h
+parser.h
+/home/jonatanw/workspace/language/ast/parser.h
+
+/home/jonatanw/workspace/language/ast/ast_unary_expr.h
+
+/home/jonatanw/workspace/language/ast/ast_var_expr.h
+
+/home/jonatanw/workspace/language/ast/ast_variable_expr.h
 
 /home/jonatanw/workspace/language/binop_precedence.h
 
@@ -160,7 +204,7 @@ llvm/Transforms/Scalar.h
 
 /home/jonatanw/workspace/language/module_manager.h
 
-/home/jonatanw/workspace/language/parse.h
+/home/jonatanw/workspace/language/parser.h
 producer.h
 /home/jonatanw/workspace/language/producer.h
 lex.h
@@ -197,10 +241,10 @@ vsx_string.h
 -
 lex.h
 /home/jonatanw/workspace/language/lex.h
-parse.h
-/home/jonatanw/workspace/language/parse.h
-ast/ast_abs.h
-/home/jonatanw/workspace/language/ast/ast_abs.h
+parser.h
+/home/jonatanw/workspace/language/parser.h
+ast/ast_function_prototype.h
+/home/jonatanw/workspace/language/ast/ast_function_prototype.h
 ast/ast.h
 /home/jonatanw/workspace/language/ast/ast.h
 error.h

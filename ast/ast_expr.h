@@ -2,11 +2,11 @@
 #define VX_AST_EXPR_H
 
 #include "llvm_includes.h"
-#include "parse.h"
+#include "parser.h"
 
 
-/// ExprAST - Base class for all expression nodes.
-class ExprAST {
+/// ast_expr - Base class for all expression nodes.
+class ast_expr {
   SourceLocation Loc;
 
 public:
@@ -21,7 +21,9 @@ public:
     return Loc.Col;
   }
 
-  ExprAST(SourceLocation Loc = CurLoc) : Loc(Loc)
+  ast_expr(SourceLocation Loc = parser::get()->get_current_location() )
+    :
+    Loc(Loc)
   {
 
   }
@@ -31,7 +33,7 @@ public:
     out += ":" + vsx_string_helper::i2s(getLine()) + ":" + vsx_string_helper::i2s(getCol()) + "\n";
   }
 
-  virtual ~ExprAST() {}
+  virtual ~ast_expr() {}
   virtual llvm::Value* Codegen() = 0;
 };
 

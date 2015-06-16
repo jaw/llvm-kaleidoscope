@@ -15,8 +15,8 @@ static llvm::ExecutionEngine *TheExecutionEngine;
 static llvm::legacy::FunctionPassManager *TheFPM;
 
 #include "lex.h"
-#include "parse.h"
-#include "ast/ast_abs.h"
+#include "parser.h"
+#include "ast/ast_function_prototype.h"
 #include "ast/ast.h"
 #include "error.h"
 #include "debuginfo/debuginfo_manager.h"
@@ -54,7 +54,7 @@ int main() {
   builder_manager::get_instance()->set_ir( new llvm::IRBuilder<>( llvm::getGlobalContext() ) );
 
   // Prime the first token.
-  getNextToken();
+  parser::get()->get_next_token();
 
   // Make the module, which holds all the code.
   std::unique_ptr< llvm::Module > Owner = llvm::make_unique< llvm::Module>("my cool jit", Context);

@@ -59,7 +59,7 @@ CMAKE_BINARY_DIR = /home/jonatanw/workspace/language/build
 CMakeFiles/toy.dir/all:
 	$(MAKE) -f CMakeFiles/toy.dir/build.make CMakeFiles/toy.dir/depend
 	$(MAKE) -f CMakeFiles/toy.dir/build.make CMakeFiles/toy.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/jonatanw/workspace/language/build/CMakeFiles  1 2 3
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/jonatanw/workspace/language/build/CMakeFiles 
 	@echo "Built target toy"
 .PHONY : CMakeFiles/toy.dir/all
 
@@ -69,7 +69,7 @@ all: CMakeFiles/toy.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/toy.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/jonatanw/workspace/language/build/CMakeFiles 3
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/jonatanw/workspace/language/build/CMakeFiles 0
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/toy.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/jonatanw/workspace/language/build/CMakeFiles 0
 .PHONY : CMakeFiles/toy.dir/rule
