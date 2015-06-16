@@ -11,7 +11,6 @@
 #include <vsx_string.h>
 
 static llvm::ExecutionEngine *TheExecutionEngine;
-//static std::map<vsx_string<>, llvm::AllocaInst *> NamedValues;
 static llvm::legacy::FunctionPassManager *TheFPM;
 
 #include "lex.h"
@@ -24,9 +23,6 @@ static llvm::legacy::FunctionPassManager *TheFPM;
 #include "codegen.h"
 #include "dispatch.h"
 
-//===----------------------------------------------------------------------===//
-// "Library" functions that can be "extern'd" from user code.
-//===----------------------------------------------------------------------===//
 
 /// putchard - putchar that takes a double and returns 0.
 extern "C" double putchard(double X) {
@@ -40,9 +36,6 @@ extern "C" double printd(double X) {
   return 0;
 }
 
-//===----------------------------------------------------------------------===//
-// Main driver code.
-//===----------------------------------------------------------------------===//
 
 int main() {
   llvm::InitializeNativeTarget();
@@ -84,6 +77,7 @@ int main() {
           .setErrorStr(&ErrStr)
           //.setMCJITMemoryManager(llvm::make_unique<SectionMemoryManager>())
           .create();
+
   if (!TheExecutionEngine) {
     fprintf(stderr, "Could not create ExecutionEngine: %s\n", ErrStr.c_str());
     exit(1);
