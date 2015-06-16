@@ -68,13 +68,22 @@ public:
   ///   ::= unary LETTER (id)
   static ast_function_prototype* parse()
   {
-    vsx_string<> FnName;
+    vsx_string<> FnName = parser::get()->get_identifier();
     SourceLocation FnLoc = parser::get()->get_current_location();
+
+    // consume '('
+    parser::get()->get_next_token();
+
+    if (parser::get()->get_current_token() != '(')
+    {
+      error::print("Expected '(' in function. Example: my_func (");
+      return 0;
+    }
 
     unsigned Kind = 0; // 0 = identifier, 1 = unary, 2 = binary.
     unsigned BinaryPrecedence = 30;
 
-    switch ( parser::get()->get_current_token() )
+    /*switch ( parser::get()->get_current_token() )
     {
     default:
       {
@@ -121,13 +130,7 @@ public:
         parser::get()->get_next_token();
       }
       break;
-    }
-
-    if (parser::get()->get_current_token() != '(')
-    {
-      error::print("Expected '(' in prototype");
-      return 0;
-    }
+    }*/
 
     std::vector<vsx_string<>> ArgNames;
     while (parser::get()->get_next_token() == tok_identifier)

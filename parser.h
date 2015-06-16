@@ -4,28 +4,60 @@
 #include "lex.h"
 #include "binop_precedence.h"
 #include "source_location.h"
-
+#include "source.h"
 
 class parser
 {
+  size_t iterator = 0;
+
   /// CurTok/getNextToken - Provide a simple token buffer.  CurTok is the current
   /// token the parser is looking at.  getNextToken reads another token from the
   /// lexer and updates CurTok with its results.
-  int CurTok;
+  int current_token;
+
   vsx_string<char> IdentifierStr; // Filled in if tok_identifier
   double NumVal;             // Filled in if tok_number
   SourceLocation CurLoc;
   SourceLocation LexLoc = { 1, 0 };
 
+  char peek(size_t distance)
+  {
+    vsx_string<>& s = source::get_instance()->get();
+
+    if (iterator + distance > s.size())
+      return 0;
+
+    return s[iterator + distance];
+  }
+
+  int advance()
+  {
+    int LastChar = source::get_instance()->get()[iterator];
+
+    if (LastChar == '\n' || LastChar == '\r') {
+      LexLoc.Line++;
+      LexLoc.Col = 0;
+    } else
+      LexLoc.Col++;
+
+    iterator++;
+    if (iterator - 1 == source::get_instance()->get().size())
+      return -1;
+
+    return LastChar;
+  }
+
 public:
 
   int get_current_token()
   {
-    return CurTok;
+    return current_token;
   }
 
   vsx_string<char>& get_identifier()
   {
+    //printf("Returning identifier: %s\n", IdentifierStr.c_str() );
+    //fflush(stdout);
     return IdentifierStr;
   }
 
@@ -44,17 +76,6 @@ public:
     return LexLoc;
   }
 
-  int advance()
-  {
-    int LastChar = get_prog_char();
-
-    if (LastChar == '\n' || LastChar == '\r') {
-      LexLoc.Line++;
-      LexLoc.Col = 0;
-    } else
-      LexLoc.Col++;
-    return LastChar;
-  }
 
 
   /// gettok - Return the next token from standard input.
@@ -68,13 +89,12 @@ public:
 
     CurLoc = LexLoc;
 
-    if (isalpha(LastChar)) { // identifier: [a-zA-Z][a-zA-Z0-9]*
+    if (isalpha(LastChar))
+    { // identifier: [a-zA-Z][a-zA-Z0-9]*
       IdentifierStr = LastChar;
       while (isalnum((LastChar = advance())))
         IdentifierStr += LastChar;
 
-      if (IdentifierStr == "def")
-        return tok_def;
       if (IdentifierStr == "extern")
         return tok_extern;
       if (IdentifierStr == "if")
@@ -93,6 +113,11 @@ public:
         return tok_unary;
       if (IdentifierStr == "var")
         return tok_var;
+
+      // Investigate if function
+      if (' ' == LastChar && '(' == peek(0))
+        return tok_function;
+
       return tok_identifier;
     }
 
@@ -130,11 +155,11 @@ public:
   /// GetTokPrecedence - Get the precedence of the pending binary operator token.
   int get_token_precedence()
   {
-    if (!isascii(CurTok))
+    if (!isascii(current_token))
       return -1;
 
     // Make sure it's a declared binop.
-    int TokPrec = binop::get_instance()->getBinopPrecedence(CurTok);
+    int TokPrec = binop::get_instance()->getBinopPrecedence(current_token);
     if (TokPrec <= 0)
       return -1;
     return TokPrec;
@@ -143,8 +168,8 @@ public:
 
   int get_next_token()
   {
-    CurTok = get_token();
-    return CurTok;
+    current_token = get_token();
+    return current_token;
   }
 
   static parser* get()

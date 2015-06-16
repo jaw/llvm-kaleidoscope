@@ -10,8 +10,11 @@
 enum Token {
   tok_eof = -1,
 
+  // function
+  tok_function = -2,
+
   // commands
-  tok_def = -2,
+  //tok_def = -2,
   tok_extern = -3,
 
   // primary
@@ -31,6 +34,7 @@ enum Token {
 
   // var definition
   tok_var = -13
+
 };
 
 /*vsx_string<char> getTokName(int Tok)

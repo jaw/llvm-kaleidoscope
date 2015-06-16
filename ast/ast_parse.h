@@ -315,9 +315,10 @@ static ast_expr *ParseExpression() {
   return ParseBinOpRHS(0, LHS);
 }
 
-/// definition ::= 'def' prototype expression
-static ast_function *ParseDefinition() {
-  parser::get()->get_next_token(); // eat def.
+
+static ast_function* parse_function()
+{
+  //parser::get()->get_next_token(); // eat def.
   ast_function_prototype* Proto = ast_function_prototype::parse();
   if (Proto == 0)
     return 0;

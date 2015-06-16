@@ -1,11 +1,13 @@
 
-//===----------------------------------------------------------------------===//
-// Top-Level parsing and JIT Driver
-//===----------------------------------------------------------------------===//
+#include "parser.h"
+#include "ast/ast_parse.h"
 
-static void HandleDefinition() {
-  if (ast_function *F = ParseDefinition()) {
-    if (!F->Codegen()) {
+
+static void HandleFunction() {
+  if (ast_function *F = parse_function())
+  {
+    if (!F->Codegen())
+    {
       fprintf(stderr, "Error reading function definition:");
     }
   } else {
@@ -13,6 +15,7 @@ static void HandleDefinition() {
     parser::get()->get_next_token();
   }
 }
+
 
 static void HandleExtern() {
   if (ast_function_prototype *P = ParseExtern()) {
@@ -42,20 +45,20 @@ static void MainLoop() {
   while (1) {
     switch ( parser::get()->get_current_token() )
     {
-      case tok_eof:
-        return;
-      case ';':
-        parser::get()->get_next_token();
-        break; // ignore top-level semicolons.
-      case tok_def:
-        HandleDefinition();
+      case tok_function:
+        HandleFunction();
         break;
+
       case tok_extern:
         HandleExtern();
         break;
+
       default:
         HandleTopLevelExpression();
         break;
+
+      case tok_eof:
+        return;
     }
   }
 }

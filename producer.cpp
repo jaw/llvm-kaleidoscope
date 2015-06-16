@@ -10,31 +10,33 @@ std::string program =
   "  if x < 3 then\n"
   "    1\n"
   "  else\n"
-  "    fib(x-1)+fib(x-2);\n"
+  "    fib(x - 1) + fib(x - 2)\n"
   "\n"
   "fib(40)\n"
 ;
 
 std::string program_new =
-    "fib (x)\n"
-    "{"
-    "  if x < 3 then\n"
-    "    1\n"
-    "  else\n"
-    "    fib(x-1)+fib(x-2);\n"
-    "}\n"
-    "\n"
-    "fib(40)\n"
-    ;
+  "fib (x)\n"
+  "{"
+  "  if x < 3 then\n"
+  "    1\n"
+  "  else\n"
+  "    fib(x - 1) + fib(x - 2)\n"
+  "}\n"
+  "\n"
+  "fib(40)\n"
+;
 
-size_t ps = program.size();
+size_t ps = program_new.size();
+
+
 
 char get_prog_char()
 {
   if (program_strpos >= ps)
     return -1;
 
-  char c = program[program_strpos];
+  char c = program_new[program_strpos];
 //  vsx_string<> s;
 //  s.push_back(c);
 //  printf("pc: %s\n", s.c_str());
