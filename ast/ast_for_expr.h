@@ -1,17 +1,17 @@
 class ast_for_expr : public ast_expr {
-  vsx_string<> VarName;
+  std::string VarName;
   ast_expr *Start, *End, *Step, *Body;
 
 public:
-  ast_for_expr(const vsx_string<> &varname, ast_expr *start, ast_expr *end,
+  ast_for_expr(const std::string &varname, ast_expr *start, ast_expr *end,
              ast_expr *step, ast_expr *body)
       : VarName(varname), Start(start), End(end), Step(step), Body(body) {}
 
-  void dump(vsx_string<char> &out, int ind) override
+  void dump(std::string &out, int ind) override
   {
-    out += vsx_string<>("for");
+    out += std::string("for");
     ast_expr::dump(out, ind);
-    vsx_string<> out2;
+    std::string out2;
 
     out2 = indent(out, ind) + "Cond:";
     Start->dump(out2, ind + 1);

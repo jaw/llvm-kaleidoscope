@@ -8,7 +8,6 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <vsx_string.h>
 
 static llvm::ExecutionEngine *TheExecutionEngine;
 static llvm::legacy::FunctionPassManager *TheFPM;

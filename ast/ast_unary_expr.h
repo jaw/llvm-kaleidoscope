@@ -10,7 +10,7 @@ public:
         Operand(operand)
   {}
 
-  void dump(vsx_string<char> &out, int ind) override
+  void dump(std::string &out, int ind) override
   {
     out += Opcode;
     ast_expr::dump(out, ind);

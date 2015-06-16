@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string>
 #include "producer.h"
-#include "vsx_string.h"
 
 size_t program_strpos = 0;
 
@@ -23,9 +22,6 @@ char get_prog_char()
     return -1;
 
   char c = program[program_strpos];
-//  vsx_string<> s;
-//  s.push_back(c);
-//  printf("pc: %s\n", s.c_str());
   fflush(stdout);
 
   program_strpos++;

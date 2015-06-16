@@ -1,21 +1,21 @@
 ///  Expression class for function calls.
 class ast_call_expr : public ast_expr {
-  vsx_string<> Callee;
+  std::string Callee;
   std::vector<ast_expr *> Args;
 
 public:
-  ast_call_expr(SourceLocation Loc, const vsx_string<> &callee,
+  ast_call_expr(SourceLocation Loc, const std::string &callee,
               std::vector<ast_expr *> &args)
       : ast_expr(Loc), Callee(callee), Args(args) {}
 
-  void dump(vsx_string<char> &out, int ind) override
+  void dump(std::string &out, int ind) override
   {
-    out += vsx_string<>("call ") + Callee;
+    out += std::string("call ") + Callee;
 
     ast_expr::dump(out, ind);
     for (ast_expr *Arg : Args)
     {
-      vsx_string<> out2 = indent(out, ind + 1);
+      std::string out2 = indent(out, ind + 1);
       Arg->dump(out2, ind + 1);
     }
   }

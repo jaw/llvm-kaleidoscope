@@ -16,8 +16,8 @@
 /// which captures its argument names as well as if it is an operator.
 class ast_function_prototype
 {
-  vsx_string<> Name;
-  std::vector<vsx_string<> > Args;
+  std::string Name;
+  std::vector<std::string > Args;
   bool isOperator;
   unsigned Precedence; // Precedence if a binary op.
   int Line;
@@ -26,8 +26,8 @@ public:
   ast_function_prototype
   (
       SourceLocation Loc,
-      const vsx_string<> &name,
-      const std::vector<vsx_string<> > &args,
+      const std::string &name,
+      const std::vector<std::string > &args,
       bool isoperator = false,
       unsigned prec = 0
   )
@@ -68,7 +68,7 @@ public:
   ///   ::= unary LETTER (id)
   static ast_function_prototype* parse()
   {
-    vsx_string<> FnName;
+    std::string FnName;
     SourceLocation FnLoc = parser::get()->get_current_location();
 
     unsigned Kind = 0; // 0 = identifier, 1 = unary, 2 = binary.
@@ -129,7 +129,7 @@ public:
       return 0;
     }
 
-    std::vector<vsx_string<>> ArgNames;
+    std::vector<std::string> ArgNames;
     while (parser::get()->get_next_token() == tok_identifier)
       ArgNames.push_back( parser::get()->get_identifier() );
     if (parser::get()->get_current_token() != ')')
@@ -258,7 +258,7 @@ public:
     }
   }
 
-  const std::vector< vsx_string<> > &getArgs() const
+  const std::vector< std::string > &getArgs() const
   {
     return Args;
   }

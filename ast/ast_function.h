@@ -19,7 +19,7 @@ public:
 
   }
 
-  virtual void dump(vsx_string<char> &out, int ind)
+  virtual void dump(std::string &out, int ind)
   {
     out += indent(out, ind) + "ast_function\n";
     ++ind;

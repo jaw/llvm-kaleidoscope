@@ -1,8 +1,7 @@
 #ifndef LEX_H
 #define LEX_H
 
-#include "vsx_string.h"
-#include "vsx_string_helper.h"
+#include "string_helper.h"
 
 
 // The lexer returns tokens [0-255] if it is an unknown character, otherwise one
@@ -33,7 +32,7 @@ enum Token {
   tok_var = -13
 };
 
-/*vsx_string<char> getTokName(int Tok)
+/*std::string getTokName(int Tok)
 {
   switch (Tok)
   {
@@ -65,7 +64,7 @@ enum Token {
       return "var";
   }
 
-  vsx_string<char> ret;
+  std::string ret;
   ret = vsx_string_helper::i2s( Tok );
 
   return ret;

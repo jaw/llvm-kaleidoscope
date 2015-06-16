@@ -1,17 +1,17 @@
 /// ast_variable_expr - Expression class for referencing a variable, like "a".
 class ast_variable_expr : public ast_expr {
-  vsx_string<char> Name;
+  std::string Name;
 
 public:
-  ast_variable_expr(SourceLocation Loc, const vsx_string<> &name)
+  ast_variable_expr(SourceLocation Loc, const std::string &name)
       : ast_expr(Loc), Name(name) {}
 
-  const vsx_string<char> &getName() const
+  const std::string &getName() const
   {
     return Name;
   }
 
-  void dump(vsx_string<char> &out, int ind) override
+  void dump(std::string &out, int ind) override
   {
     out += Name;
     ast_expr::dump(out, ind);

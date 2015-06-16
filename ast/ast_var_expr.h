@@ -1,14 +1,14 @@
 /// ast_var_expr - Expression class for var/in
 class ast_var_expr : public ast_expr {
-  std::vector<std::pair<vsx_string<>, ast_expr *> > VarNames;
+  std::vector<std::pair<std::string, ast_expr *> > VarNames;
   ast_expr *Body;
 
 public:
-  ast_var_expr(const std::vector<std::pair<vsx_string<>, ast_expr *> > &varnames,
+  ast_var_expr(const std::vector<std::pair<std::string, ast_expr *> > &varnames,
              ast_expr *body)
       : VarNames(varnames), Body(body) {}
 
-  void dump(vsx_string<char> &out, int ind) override
+  void dump(std::string &out, int ind) override
   {
   out += "var";
     ast_expr::dump(out, ind);
@@ -30,7 +30,7 @@ public:
 
     // Register all variables and emit their initializer.
     for (unsigned i = 0, e = VarNames.size(); i != e; ++i) {
-      const vsx_string<> &VarName = VarNames[i].first;
+      const std::string &VarName = VarNames[i].first;
       ast_expr *Init = VarNames[i].second;
 
       // Emit the initializer before adding the variable to scope, this prevents

@@ -12,7 +12,7 @@ class parser
   /// token the parser is looking at.  getNextToken reads another token from the
   /// lexer and updates CurTok with its results.
   int CurTok;
-  vsx_string<char> IdentifierStr; // Filled in if tok_identifier
+  std::string IdentifierStr; // Filled in if tok_identifier
   double NumVal;             // Filled in if tok_number
   SourceLocation CurLoc;
   SourceLocation LexLoc = { 1, 0 };
@@ -24,7 +24,7 @@ public:
     return CurTok;
   }
 
-  vsx_string<char>& get_identifier()
+  std::string& get_identifier()
   {
     return IdentifierStr;
   }
@@ -97,7 +97,7 @@ public:
     }
 
     if (isdigit(LastChar) || LastChar == '.') { // Number: [0-9.]+
-      vsx_string<char> NumStr;
+      std::string NumStr;
       do {
         NumStr += LastChar;
         LastChar = advance();

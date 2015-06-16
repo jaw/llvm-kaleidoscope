@@ -9,7 +9,7 @@
 // Abstract Syntax Tree (aka Parse Tree)
 //===----------------------------------------------------------------------===//
 
-vsx_string<> &indent(vsx_string<> &O, int size)
+std::string &indent(std::string &O, int size)
 {
   for (size_t i = 0; i < size; i++)
     O += ' ';

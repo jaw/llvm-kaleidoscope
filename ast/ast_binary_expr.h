@@ -8,11 +8,11 @@ public:
   ast_binary_expr(SourceLocation Loc, char op, ast_expr *lhs, ast_expr *rhs)
       : ast_expr(Loc), Op(op), LHS(lhs), RHS(rhs) {}
 
-  void dump(vsx_string<char> &out, int ind) override
+  void dump(std::string &out, int ind) override
   {
-    out += vsx_string<>("binary") + Op;
+    out += std::string("binary") + Op;
     ast_expr::dump(out, ind);
-    vsx_string<> out2 = indent(out, ind) + "LHS:";
+    std::string out2 = indent(out, ind) + "LHS:";
     LHS->dump(out2, ind + 1);
     out2 = indent(out, ind) + "RHS:";
     RHS->dump(out2, ind + 1);

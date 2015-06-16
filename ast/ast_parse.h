@@ -11,7 +11,7 @@ static ast_expr *ParseExpression();
 ///   ::= identifier '(' expression* ')'
 static ast_expr *ParseIdentifierExpr()
 {
-  vsx_string<> IdName = parser::get()->get_identifier();
+  std::string IdName = parser::get()->get_identifier();
 
   SourceLocation LitLoc = parser::get()->get_current_location();
 
@@ -118,7 +118,7 @@ static ast_expr *ParseForExpr() {
     return 0;
   }
 
-  vsx_string<> IdName = parser::get()->get_identifier();
+  std::string IdName = parser::get()->get_identifier();
   parser::get()->get_next_token(); // eat identifier.
 
   if (parser::get()->get_current_token() != '=')
@@ -170,7 +170,7 @@ static ast_expr *ParseForExpr() {
 static ast_expr *ParseVarExpr() {
   parser::get()->get_next_token(); // eat the var.
 
-  std::vector<std::pair<vsx_string<>, ast_expr *> > VarNames;
+  std::vector<std::pair<std::string, ast_expr *> > VarNames;
 
   // At least one variable name is required.
   if (parser::get()->get_current_token() != tok_identifier)
@@ -180,7 +180,7 @@ static ast_expr *ParseVarExpr() {
   }
 
   while (1) {
-    vsx_string<> Name = parser::get()->get_identifier();
+    std::string Name = parser::get()->get_identifier();
     parser::get()->get_next_token(); // eat identifier.
 
     // Read the optional initializer.
@@ -333,7 +333,7 @@ static ast_function *ParseTopLevelExpr() {
   if (ast_expr *E = ParseExpression()) {
     // Make an anonymous proto.
     ast_function_prototype *Proto =
-        new ast_function_prototype(FnLoc, "main", std::vector< vsx_string<> >());
+        new ast_function_prototype(FnLoc, "main", std::vector< std::string >());
     return new ast_function(Proto, E);
   }
   return 0;

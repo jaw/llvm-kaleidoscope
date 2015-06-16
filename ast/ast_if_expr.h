@@ -20,11 +20,11 @@ public:
         Else(_else)
   {}
 
-  void dump(vsx_string<char> &out, int ind) override
+  void dump(std::string &out, int ind) override
   {
-    out += vsx_string<>("if");
+    out += std::string("if");
     ast_expr::dump(out, ind);
-    vsx_string<> out2;
+    std::string out2;
 
     out2 = indent(out, ind) + "Cond:";
     Cond->dump(out2, ind + 1);

@@ -23,24 +23,9 @@ ${LLVM_INCLUDE_DIRS}
 )
 
 set(SOURCES
-	toy.cpp
-	ast/ast.h
-	ast/ast_abs.h
-	ast/ast_parse.h
-	ast/ast_expr.h
-	binop_precedence.h
-	error.h
-	lex.h
-	parse.h
-	debuginfo/debuginfo_abs.h
-	debuginfo/debuginfo.h
-	debuginfo/debuginfo_manager.h
+	main.cpp
 	debuginfo/debuginfo_manager.cpp
-	codegen.h
-	dispatch.h
-	producer.h
 	producer.cpp
-	vsxu/string/vsx_string.h
 )
 
 add_executable(toy ${SOURCES})

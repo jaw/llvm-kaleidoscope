@@ -3,6 +3,7 @@
 
 #include "llvm_includes.h"
 #include "parser.h"
+#include "string_helper.h"
 
 
 /// ast_expr - Base class for all expression nodes.
@@ -28,9 +29,9 @@ public:
 
   }
 
-  virtual void dump(vsx_string<char> &out, int ind)
+  virtual void dump(std::string &out, int ind)
   {
-    out += ":" + vsx_string_helper::i2s(getLine()) + ":" + vsx_string_helper::i2s(getCol()) + "\n";
+    out += ":" + string_helper::i2s(getLine()) + ":" + string_helper::i2s(getCol()) + "\n";
   }
 
   virtual ~ast_expr() {}

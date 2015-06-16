@@ -9,9 +9,9 @@ class ast_number_expr :
 public:
   ast_number_expr(double val) : Val(val) {}
 
-  void dump(vsx_string<char> &out, int ind)
+  void dump(std::string &out, int ind)
   {
-    out += vsx_string_helper::f2s(Val);
+    out += string_helper::f2s(Val);
     ast_expr::dump(out, ind);
   }
 
