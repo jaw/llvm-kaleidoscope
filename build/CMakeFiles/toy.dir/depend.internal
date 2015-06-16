@@ -5,8 +5,14 @@ CMakeFiles/toy.dir/debuginfo/debuginfo_manager.cpp.o
  ../ast/ast_abs.h
  ../ast/ast_expr.h
  ../binop_precedence.h
+ ../builder_manager.h
+ ../debuginfo/debuginfo_manager.h
+ ../error.h
  ../lex.h
+ ../llvm_helper.h
  ../llvm_includes.h
+ ../module_manager.h
+ ../named_values.h
  ../parse.h
  ../producer.h
  ../source_location.h
@@ -149,7 +155,8 @@ CMakeFiles/toy.dir/producer.cpp.o
  /home/jonatanw/workspace/language/producer.cpp
  /home/jonatanw/workspace/language/producer.h
 CMakeFiles/toy.dir/toy.cpp.o
- ../ast/ast_expr.h
+ ../llvm_helper.h
+ ../named_values.h
  ../vsxu/container/vsx_nw_vector.h
  ../vsxu/string/vsx_string.h
  ../vsxu/string/vsx_string_helper.h
@@ -161,6 +168,7 @@ CMakeFiles/toy.dir/toy.cpp.o
  /home/jonatanw/workspace/language/ast/ast_expr.h
  /home/jonatanw/workspace/language/ast/ast_parse.h
  /home/jonatanw/workspace/language/binop_precedence.h
+ /home/jonatanw/workspace/language/builder_manager.h
  /home/jonatanw/workspace/language/codegen.h
  /home/jonatanw/workspace/language/debuginfo/debuginfo_abs.h
  /home/jonatanw/workspace/language/debuginfo/debuginfo_manager.h
@@ -168,6 +176,7 @@ CMakeFiles/toy.dir/toy.cpp.o
  /home/jonatanw/workspace/language/error.h
  /home/jonatanw/workspace/language/lex.h
  /home/jonatanw/workspace/language/llvm_includes.h
+ /home/jonatanw/workspace/language/module_manager.h
  /home/jonatanw/workspace/language/parse.h
  /home/jonatanw/workspace/language/producer.h
  /home/jonatanw/workspace/language/source_location.h

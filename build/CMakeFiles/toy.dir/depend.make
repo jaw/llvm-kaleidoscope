@@ -4,8 +4,14 @@
 CMakeFiles/toy.dir/debuginfo/debuginfo_manager.cpp.o: ../ast/ast_abs.h
 CMakeFiles/toy.dir/debuginfo/debuginfo_manager.cpp.o: ../ast/ast_expr.h
 CMakeFiles/toy.dir/debuginfo/debuginfo_manager.cpp.o: ../binop_precedence.h
+CMakeFiles/toy.dir/debuginfo/debuginfo_manager.cpp.o: ../builder_manager.h
+CMakeFiles/toy.dir/debuginfo/debuginfo_manager.cpp.o: ../debuginfo/debuginfo_manager.h
+CMakeFiles/toy.dir/debuginfo/debuginfo_manager.cpp.o: ../error.h
 CMakeFiles/toy.dir/debuginfo/debuginfo_manager.cpp.o: ../lex.h
+CMakeFiles/toy.dir/debuginfo/debuginfo_manager.cpp.o: ../llvm_helper.h
 CMakeFiles/toy.dir/debuginfo/debuginfo_manager.cpp.o: ../llvm_includes.h
+CMakeFiles/toy.dir/debuginfo/debuginfo_manager.cpp.o: ../module_manager.h
+CMakeFiles/toy.dir/debuginfo/debuginfo_manager.cpp.o: ../named_values.h
 CMakeFiles/toy.dir/debuginfo/debuginfo_manager.cpp.o: ../parse.h
 CMakeFiles/toy.dir/debuginfo/debuginfo_manager.cpp.o: ../producer.h
 CMakeFiles/toy.dir/debuginfo/debuginfo_manager.cpp.o: ../source_location.h
@@ -148,7 +154,8 @@ CMakeFiles/toy.dir/producer.cpp.o: ../vsxu/vsx_platform.h
 CMakeFiles/toy.dir/producer.cpp.o: ../producer.cpp
 CMakeFiles/toy.dir/producer.cpp.o: ../producer.h
 
-CMakeFiles/toy.dir/toy.cpp.o: ../ast/ast_expr.h
+CMakeFiles/toy.dir/toy.cpp.o: ../llvm_helper.h
+CMakeFiles/toy.dir/toy.cpp.o: ../named_values.h
 CMakeFiles/toy.dir/toy.cpp.o: ../vsxu/container/vsx_nw_vector.h
 CMakeFiles/toy.dir/toy.cpp.o: ../vsxu/string/vsx_string.h
 CMakeFiles/toy.dir/toy.cpp.o: ../vsxu/string/vsx_string_helper.h
@@ -160,6 +167,7 @@ CMakeFiles/toy.dir/toy.cpp.o: ../ast/ast_abs.h
 CMakeFiles/toy.dir/toy.cpp.o: ../ast/ast_expr.h
 CMakeFiles/toy.dir/toy.cpp.o: ../ast/ast_parse.h
 CMakeFiles/toy.dir/toy.cpp.o: ../binop_precedence.h
+CMakeFiles/toy.dir/toy.cpp.o: ../builder_manager.h
 CMakeFiles/toy.dir/toy.cpp.o: ../codegen.h
 CMakeFiles/toy.dir/toy.cpp.o: ../debuginfo/debuginfo_abs.h
 CMakeFiles/toy.dir/toy.cpp.o: ../debuginfo/debuginfo_manager.h
@@ -167,6 +175,7 @@ CMakeFiles/toy.dir/toy.cpp.o: ../dispatch.h
 CMakeFiles/toy.dir/toy.cpp.o: ../error.h
 CMakeFiles/toy.dir/toy.cpp.o: ../lex.h
 CMakeFiles/toy.dir/toy.cpp.o: ../llvm_includes.h
+CMakeFiles/toy.dir/toy.cpp.o: ../module_manager.h
 CMakeFiles/toy.dir/toy.cpp.o: ../parse.h
 CMakeFiles/toy.dir/toy.cpp.o: ../producer.h
 CMakeFiles/toy.dir/toy.cpp.o: ../source_location.h

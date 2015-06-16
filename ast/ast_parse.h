@@ -31,7 +31,10 @@ static ExprAST *ParseIdentifierExpr()
         break;
 
       if (CurTok != ',')
-        return Error("Expected ')' or ',' in argument list");
+      {
+        error::print("Expected ')' or ',' in argument list");
+        return 0;
+      }
       getNextToken();
     }
   }
@@ -57,7 +60,10 @@ static ExprAST *ParseParenExpr() {
     return 0;
 
   if (CurTok != ')')
-    return Error("expected ')'");
+  {
+    error::print("expected ')'");
+    return 0;
+  }
   getNextToken(); // eat ).
   return V;
 }
@@ -74,7 +80,10 @@ static ExprAST *ParseIfExpr() {
     return 0;
 
   if (CurTok != tok_then)
-    return Error("expected then");
+  {
+    error::print("expected then");
+    return 0;
+  }
   getNextToken(); // eat the then
 
   ExprAST *Then = ParseExpression();
@@ -82,7 +91,10 @@ static ExprAST *ParseIfExpr() {
     return 0;
 
   if (CurTok != tok_else)
-    return Error("expected else");
+  {
+    error::print("expected else");
+    return 0;
+  }
 
   getNextToken();
 
@@ -98,20 +110,29 @@ static ExprAST *ParseForExpr() {
   getNextToken(); // eat the for.
 
   if (CurTok != tok_identifier)
-    return Error("expected identifier after for");
+  {
+    error::print("expected identifier after for");
+    return 0;
+  }
 
   vsx_string<> IdName = IdentifierStr;
   getNextToken(); // eat identifier.
 
   if (CurTok != '=')
-    return Error("expected '=' after for");
+  {
+    error::print("expected '=' after for");
+    return 0;
+  }
   getNextToken(); // eat '='.
 
   ExprAST *Start = ParseExpression();
   if (Start == 0)
     return 0;
   if (CurTok != ',')
-    return Error("expected ',' after for start value");
+  {
+    error::print("expected ',' after for start value");
+    return 0;
+  }
   getNextToken();
 
   ExprAST *End = ParseExpression();
@@ -128,7 +149,10 @@ static ExprAST *ParseForExpr() {
   }
 
   if (CurTok != tok_in)
-    return Error("expected 'in' after for");
+  {
+    error::print("expected 'in' after for");
+    return 0;
+  }
   getNextToken(); // eat 'in'.
 
   ExprAST *Body = ParseExpression();
@@ -147,7 +171,10 @@ static ExprAST *ParseVarExpr() {
 
   // At least one variable name is required.
   if (CurTok != tok_identifier)
-    return Error("expected identifier after var");
+  {
+    error::print("expected identifier after var");
+    return 0;
+  }
 
   while (1) {
     vsx_string<> Name = IdentifierStr;
@@ -171,12 +198,18 @@ static ExprAST *ParseVarExpr() {
     getNextToken(); // eat the ','.
 
     if (CurTok != tok_identifier)
-      return Error("expected identifier list after var");
+    {
+      error::print("expected identifier list after var");
+      return 0;
+    }
   }
 
   // At this point, we have to have 'in'.
   if (CurTok != tok_in)
-    return Error("expected 'in' keyword after 'var'");
+  {
+    error::print("expected 'in' keyword after 'var'");
+    return 0;
+  }
   getNextToken(); // eat 'in'.
 
   ExprAST *Body = ParseExpression();
@@ -197,7 +230,10 @@ static ExprAST *ParsePrimary() {
   switch (CurTok)
   {
     default:
-        return Error("unknown token when expecting an expression");
+    {
+      error::print("unknown token when expecting an expression");
+      return 0;
+    }
     case tok_identifier:
       return ParseIdentifierExpr();
     case tok_number:
@@ -290,7 +326,10 @@ static PrototypeAST *ParsePrototype() {
 
   switch (CurTok) {
   default:
-    return ErrorP("Expected function name in prototype");
+    {
+      error::print("Expected function name in prototype");
+      return 0;
+    }
   case tok_identifier:
     FnName = IdentifierStr;
     Kind = 0;
@@ -299,7 +338,10 @@ static PrototypeAST *ParsePrototype() {
   case tok_unary:
     getNextToken();
     if (!isascii(CurTok))
-      return ErrorP("Expected unary operator");
+    {
+      error::print("Expected unary operator");
+      return 0;
+    }
     FnName = "unary";
     FnName += (char)CurTok;
     Kind = 1;
@@ -308,7 +350,10 @@ static PrototypeAST *ParsePrototype() {
   case tok_binary:
     getNextToken();
     if (!isascii(CurTok))
-      return ErrorP("Expected binary operator");
+    {
+      error::print("Expected binary operator");
+      return 0;
+    }
     FnName = "binary";
     FnName += (char)CurTok;
     Kind = 2;
@@ -317,7 +362,10 @@ static PrototypeAST *ParsePrototype() {
     // Read the precedence if present.
     if (CurTok == tok_number) {
       if (NumVal < 1 || NumVal > 100)
-        return ErrorP("Invalid precedecnce: must be 1..100");
+      {
+        error::print("Invalid precedecnce: must be 1..100");
+        return 0;
+      }
       BinaryPrecedence = (unsigned)NumVal;
       getNextToken();
     }
@@ -325,20 +373,29 @@ static PrototypeAST *ParsePrototype() {
   }
 
   if (CurTok != '(')
-    return ErrorP("Expected '(' in prototype");
+  {
+    error::print("Expected '(' in prototype");
+    return 0;
+  }
 
   std::vector<vsx_string<>> ArgNames;
   while (getNextToken() == tok_identifier)
     ArgNames.push_back(IdentifierStr);
   if (CurTok != ')')
-    return ErrorP("Expected ')' in prototype");
+  {
+    error::print("Expected ')' in prototype");
+    return 0;
+  }
 
   // success.
   getNextToken(); // eat ')'.
 
   // Verify right number of names for operator.
   if (Kind && ArgNames.size() != Kind)
-    return ErrorP("Invalid number of operands for operator");
+  {
+    error::print("Invalid number of operands for operator");
+    return 0;
+  }
 
   return new PrototypeAST(FnLoc, FnName, ArgNames, Kind != 0, BinaryPrecedence);
 }

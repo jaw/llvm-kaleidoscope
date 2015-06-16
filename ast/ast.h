@@ -3,6 +3,7 @@
 
 #include "debuginfo/debuginfo_manager.h"
 #include "ast_expr.h"
+#include "named_values.h"
 
 //===----------------------------------------------------------------------===//
 // Abstract Syntax Tree (aka Parse Tree)
@@ -31,10 +32,10 @@ public:
     ExprAST::dump(out, ind);
   }
 
-  Value *Codegen()
+  llvm::Value *Codegen()
   {
     debug_manager::get_instance()->emitLocation(this);
-    return ConstantFP::get(getGlobalContext(), APFloat(Val));
+    return llvm::ConstantFP::get( llvm::getGlobalContext(), llvm::APFloat(Val) );
   }
 
 };
@@ -58,7 +59,7 @@ public:
     ExprAST::dump(out, ind);
   }
 
-  Value *Codegen() override;
+  llvm::Value *Codegen() override;
 };
 
 /// UnaryExprAST - Expression class for a unary operator.
@@ -80,7 +81,7 @@ public:
     Operand->dump(out, ind + 1);
   }
 
-  Value *Codegen() override;
+  llvm::Value *Codegen() override;
 };
 
 /// BinaryExprAST - Expression class for a binary operator.
@@ -101,7 +102,7 @@ public:
     out2 = indent(out, ind) + "RHS:";
     RHS->dump(out2, ind + 1);
   }
-  Value *Codegen() override;
+  llvm::Value *Codegen() override;
 };
 
 /// CallExprAST - Expression class for function calls.
@@ -126,7 +127,7 @@ public:
     }
   }
 
-  Value *Codegen() override;
+  llvm::Value *Codegen() override;
 };
 
 /// IfExprAST - Expression class for if/then/else.
@@ -151,7 +152,7 @@ public:
     Else->dump(out2, ind + 1);
   }
 
-  Value *Codegen() override;
+  llvm::Value *Codegen() override;
 };
 
 /// ForExprAST - Expression class for for/in.
@@ -183,7 +184,7 @@ public:
     Body->dump(out2, ind + 1);
   }
 
-  Value *Codegen() override;
+  llvm::Value *Codegen() override;
 };
 
 /// VarExprAST - Expression class for var/in
@@ -210,7 +211,7 @@ public:
     Body->dump( out, ind + 1);
   }
 
-  Value *Codegen() override;
+  llvm::Value *Codegen() override;
 };
 
 
@@ -233,7 +234,64 @@ public:
       out += "null\n";
   }
 
-  Function *Codegen();
+  llvm::Function *Codegen()
+  {
+    named_values::get_instance()->clear();
+
+    llvm::Function *TheFunction = Proto->Codegen();
+    if (TheFunction == 0)
+      return 0;
+
+    // Push the current scope.
+    debug_manager::get_instance()->addFunctionScopeToLexicalBlocks(Proto);
+
+    // Unset the location for the prologue emission (leading instructions with no
+    // location in a function are considered part of the prologue and the debugger
+    // will run past them when breaking on a function)
+    debug_manager::get_instance()->emitLocation(nullptr);
+
+
+    // If this is an operator, install it.
+    if (Proto->isBinaryOp())
+      binop::get_instance()->setPrecedence( Proto->getOperatorName(), Proto->getBinaryPrecedence() );
+
+    // Create a new basic block to start insertion into.
+    llvm::BasicBlock *BB = llvm::BasicBlock::Create( llvm::getGlobalContext(), "entry", TheFunction);
+    builder_manager::get_instance()->get_ir()->SetInsertPoint(BB);
+
+    // Add all arguments to the symbol table and create their allocas.
+    Proto->CreateArgumentAllocas(TheFunction);
+
+    debug_manager::get_instance()->emitLocation(Body);
+
+    if (llvm::Value *RetVal = Body->Codegen()) {
+      // Finish off the function.
+      builder_manager::get_instance()->get_ir()->CreateRet(RetVal);
+
+      // Pop off the lexical block for the function.
+      debug_manager::get_instance()->getLexicalBlocks()->pop_back();
+
+      // Validate the generated code, checking for consistency.
+      verifyFunction(*TheFunction);
+
+      // Optimize the function.
+      TheFPM->run(*TheFunction);
+
+      return TheFunction;
+    }
+
+    // Error reading body, remove function.
+    TheFunction->eraseFromParent();
+
+    if (Proto->isBinaryOp())
+      binop::get_instance()->removePrecedence( Proto->getOperatorName() );
+
+    // Pop off the lexical block for the function since we added it
+    // unconditionally.
+    debug_manager::get_instance()->getLexicalBlocks()->pop_back();
+
+    return 0;
+  }
 };
 
 #endif

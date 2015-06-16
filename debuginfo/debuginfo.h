@@ -3,6 +3,9 @@
 
 #include "llvm_includes.h"
 #include "debuginfo_abs.h"
+#include "ast/ast_abs.h"
+#include "ast/ast_expr.h"
+#include "builder_manager.h"
 
 using namespace llvm;
 
@@ -10,28 +13,16 @@ class debug_info
     : public debug_abs
 {
   llvm::DICompileUnit *TheCU;
-  llvm::IRBuilder<>* IBuilder;
-  llvm::DIBuilder* DBuilder;
   llvm::DIType DblTy;
   std::vector<llvm::DIScope *> LexicalBlocks;
-  std::map<const PrototypeAST *, llvm::DIScope *> FnScopeMap;
+  std::map< const PrototypeAST *, llvm::DIScope *> FnScopeMap;
 
 public:
-
-  void setIRBuilder(llvm::IRBuilder<>* n)
-  {
-    IBuilder = n;
-  }
-
-  void setDBuilder(llvm::DIBuilder* n)
-  {
-    DBuilder = n;
-  }
 
   void init()
   {
     TheCU = new DICompileUnit();
-    *TheCU = DBuilder->createCompileUnit(
+    *TheCU = builder_manager::get_instance()->get_di()->createCompileUnit(
         dwarf::DW_LANG_C, "fib.ks", ".", "Kaleidoscope Compiler", 0, "", 0);
   }
 
@@ -40,27 +31,36 @@ public:
     return TheCU;
   }
 
-  void addFunctionScopeMap(PrototypeAST* proto, llvm::DIScope* scope)
+  void addFunctionScopeMap(void* proto, llvm::DIScope* scope)
   {
-    FnScopeMap[proto] = scope;
+    PrototypeAST* p = static_cast<PrototypeAST*>(proto);
+    if (p)
+      FnScopeMap[p] = scope;
   }
 
-  void addFunctionScopeToLexicalBlocks(PrototypeAST* proto)
+  void addFunctionScopeToLexicalBlocks(void* proto)
   {
-    LexicalBlocks.push_back(FnScopeMap[proto]);
+    PrototypeAST* p = static_cast<PrototypeAST*>(proto);
+    if (p)
+      LexicalBlocks.push_back(FnScopeMap[p]);
   }
 
-  void emitLocation(ExprAST *AST)
+  void emitLocation(void *AST)
   {
     if (!AST)
-      return IBuilder->SetCurrentDebugLocation(DebugLoc());
+      return builder_manager::get_instance()->get_ir()->SetCurrentDebugLocation(DebugLoc());
+
+    ExprAST* pAST = static_cast<ExprAST*>(AST);
+
+
     DIScope *Scope;
     if (LexicalBlocks.empty())
       Scope = TheCU;
     else
       Scope = LexicalBlocks.back();
-    IBuilder->SetCurrentDebugLocation(
-    DebugLoc::get(AST->getLine(), AST->getCol(), *Scope));
+    builder_manager::get_instance()->get_ir()->SetCurrentDebugLocation(
+      DebugLoc::get(pAST->getLine(), pAST->getCol(), *Scope)
+    );
   }
 
   DIType *getDoubleTy()
@@ -68,7 +68,7 @@ public:
     if (DblTy)
       return &DblTy;
 
-    DblTy = DBuilder->createBasicType("double", 64, 64, dwarf::DW_ATE_float);
+    DblTy = builder_manager::get_instance()->get_di()->createBasicType("double", 64, 64, dwarf::DW_ATE_float);
     return &DblTy;
   }
 
@@ -89,8 +89,10 @@ public:
       EltTys.push_back(*DblTy);
 
     DISubroutineType* dt = new DISubroutineType;
-    *dt = DBuilder->createSubroutineType(*Unit,
-                                            DBuilder->getOrCreateTypeArray(EltTys));
+    *dt = builder_manager::get_instance()->get_di()->createSubroutineType(
+          *Unit,
+          builder_manager::get_instance()->get_di()->getOrCreateTypeArray(EltTys)
+    );
 
     return dt;
   }

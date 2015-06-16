@@ -1,4 +1,6 @@
 #include "llvm_includes.h"
+#include "module_manager.h"
+#include "builder_manager.h"
 
 #include <cctype>
 #include <cstdio>
@@ -8,14 +10,9 @@
 #include <vector>
 #include <vsx_string.h>
 
-using namespace llvm;
-
 static llvm::ExecutionEngine *TheExecutionEngine;
-static llvm::DIBuilder *DBuilder;
-static llvm::Module *TheModule;
-static std::map<vsx_string<>, llvm::AllocaInst *> NamedValues;
+//static std::map<vsx_string<>, llvm::AllocaInst *> NamedValues;
 static llvm::legacy::FunctionPassManager *TheFPM;
-static llvm::IRBuilder<> Builder(llvm::getGlobalContext());
 
 #include "lex.h"
 #include "parse.h"
@@ -48,31 +45,32 @@ extern "C" double printd(double X) {
 //===----------------------------------------------------------------------===//
 
 int main() {
-  InitializeNativeTarget();
-  InitializeNativeTargetAsmPrinter();
-  InitializeNativeTargetAsmParser();
-  LLVMContext &Context = getGlobalContext();
+  llvm::InitializeNativeTarget();
+  llvm::InitializeNativeTargetAsmPrinter();
+  llvm::InitializeNativeTargetAsmParser();
+  llvm::LLVMContext &Context = llvm::getGlobalContext();
+
+  // Initialize IR builder
+  builder_manager::get_instance()->set_ir( new llvm::IRBuilder<>( llvm::getGlobalContext() ) );
 
   // Prime the first token.
   getNextToken();
 
   // Make the module, which holds all the code.
-  std::unique_ptr<Module> Owner = make_unique<Module>("my cool jit", Context);
-  TheModule = Owner.get();
+  std::unique_ptr< llvm::Module > Owner = llvm::make_unique< llvm::Module>("my cool jit", Context);
+
+  module_manager::get_instance()->set( Owner.get() );
 
   // Add the current debug info version into the module.
-  TheModule->addModuleFlag(Module::Warning, "Debug Info Version",
-                           DEBUG_METADATA_VERSION);
+  module_manager::get_instance()->get()->addModuleFlag( llvm::Module::Warning, "Debug Info Version",
+                           llvm::DEBUG_METADATA_VERSION);
 
   // Darwin only supports dwarf2.
-  if (Triple(sys::getProcessTriple()).isOSDarwin())
-    TheModule->addModuleFlag(llvm::Module::Warning, "Dwarf Version", 2);
+  if (llvm::Triple( llvm::sys::getProcessTriple()).isOSDarwin())
+    module_manager::get_instance()->get()->addModuleFlag(llvm::Module::Warning, "Dwarf Version", 2);
 
   // Construct the DIBuilder, we do this here because we need the module.
-  DBuilder = new DIBuilder(*TheModule);
-
-  debug_manager::get_instance()->setIRBuilder( &Builder );
-  debug_manager::get_instance()->setDBuilder( DBuilder );
+  builder_manager::get_instance()->set_di( new llvm::DIBuilder(*module_manager::get_instance()->get()) );
 
   // Create the compile unit for the module.
   // Currently down as "fib.ks" as a filename since we're redirecting stdin
@@ -82,7 +80,7 @@ int main() {
   // Create the JIT.  This takes ownership of the module.
   std::string ErrStr;
   TheExecutionEngine =
-      EngineBuilder(std::move(Owner))
+      llvm::EngineBuilder(std::move(Owner))
           .setErrorStr(&ErrStr)
           //.setMCJITMemoryManager(llvm::make_unique<SectionMemoryManager>())
           .create();
@@ -91,11 +89,11 @@ int main() {
     exit(1);
   }
 
-  legacy::FunctionPassManager OurFPM(TheModule);
+  llvm::legacy::FunctionPassManager OurFPM( module_manager::get_instance()->get() );
 
   // Set up the optimizer pipeline.  Start with registering info about how the
   // target lays out data structures.
-  TheModule->setDataLayout(TheExecutionEngine->getDataLayout());
+  module_manager::get_instance()->get()->setDataLayout(TheExecutionEngine->getDataLayout());
   #if 0
   // Provide basic AliasAnalysis support for GVN.
   OurFPM.add(createBasicAliasAnalysisPass());
@@ -121,10 +119,10 @@ int main() {
   TheFPM = 0;
 
   // Finalize the debug info.
-  DBuilder->finalize();
+  builder_manager::get_instance()->get_di()->finalize();
 
   // Print out all of the generated code.
-  TheModule->dump();
+  module_manager::get_instance()->get()->dump();
 
   return 0;
 }
