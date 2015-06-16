@@ -15,18 +15,6 @@ std::string program =
   "fib(40)\n"
 ;
 
-std::string program_new =
-    "fib (x)\n"
-    "{"
-    "  if x < 3 then\n"
-    "    1\n"
-    "  else\n"
-    "    fib(x-1)+fib(x-2);\n"
-    "}\n"
-    "\n"
-    "fib(40)\n"
-    ;
-
 size_t ps = program.size();
 
 char get_prog_char()
