@@ -40,21 +40,22 @@ static void HandleTopLevelExpression() {
 /// top ::= definition | external | expression | ';'
 static void MainLoop() {
   while (1) {
-    switch (CurTok) {
-    case tok_eof:
-      return;
-    case ';':
-      getNextToken();
-      break; // ignore top-level semicolons.
-    case tok_def:
-      HandleDefinition();
-      break;
-    case tok_extern:
-      HandleExtern();
-      break;
-    default:
-      HandleTopLevelExpression();
-      break;
+    switch (CurTok)
+    {
+      case tok_eof:
+        return;
+      case ';':
+        getNextToken();
+        break; // ignore top-level semicolons.
+      case tok_def:
+        HandleDefinition();
+        break;
+      case tok_extern:
+        HandleExtern();
+        break;
+      default:
+        HandleTopLevelExpression();
+        break;
     }
   }
 }

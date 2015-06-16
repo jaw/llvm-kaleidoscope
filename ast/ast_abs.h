@@ -1,5 +1,9 @@
 #ifndef VX_AST_ABS_H
 #define VX_AST_ABS_H
+
+#include "llvm_includes.h"
+#include "source_location.h"
+
 /// PrototypeAST - This class represents the "prototype" for a function,
 /// which captures its argument names as well as if it is an operator.
 class PrototypeAST {

@@ -3,7 +3,7 @@
 #include "producer.h"
 #include "lex.h"
 #include "binop_precedence.h"
-
+#include "source_location.h"
 
 //===----------------------------------------------------------------------===//
 // Parser
@@ -12,15 +12,12 @@
 /// CurTok/getNextToken - Provide a simple token buffer.  CurTok is the current
 /// token the parser is looking at.  getNextToken reads another token from the
 /// lexer and updates CurTok with its results.
-int CurTok;
+static int CurTok;
 
 
 static vsx_string<char> IdentifierStr; // Filled in if tok_identifier
 static double NumVal;             // Filled in if tok_number
-struct SourceLocation {
-  int Line;
-  int Col;
-};
+
 static SourceLocation CurLoc;
 static SourceLocation LexLoc = { 1, 0 };
 
@@ -109,14 +106,17 @@ static int GetTokPrecedence() {
     return -1;
 
   // Make sure it's a declared binop.
-  int TokPrec = binop::getBinopPrecedence(CurTok);
+  int TokPrec = binop::get_instance()->getBinopPrecedence(CurTok);
   if (TokPrec <= 0)
     return -1;
   return TokPrec;
 }
 
 
-static int getNextToken() { return CurTok = gettok(); }
+static int getNextToken() {
+  CurTok = gettok();
+  return CurTok;
+}
 
 
 

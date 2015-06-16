@@ -1,6 +1,7 @@
 #ifndef VX_AST_EXPR_H
 #define VX_AST_EXPR_H
 
+#include "llvm_includes.h"
 #include "parse.h"
 
 
@@ -31,7 +32,7 @@ public:
   }
 
   virtual ~ExprAST() {}
-  virtual Value* Codegen() = 0;
+  virtual llvm::Value* Codegen() = 0;
 };
 
 

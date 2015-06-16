@@ -33,7 +33,7 @@ enum Token {
   tok_var = -13
 };
 
-vsx_string<char> getTokName(int Tok)
+/*vsx_string<char> getTokName(int Tok)
 {
   switch (Tok)
   {
@@ -70,6 +70,6 @@ vsx_string<char> getTokName(int Tok)
 
   return ret;
 }
-
+*/
 
 #endif

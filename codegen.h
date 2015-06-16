@@ -1,23 +1,7 @@
-#include "llvm/ADT/STLExtras.h"
-#include "llvm/ADT/Triple.h"
-#include "llvm/Analysis/Passes.h"
-#include "llvm/ExecutionEngine/ExecutionEngine.h"
-#include "llvm/ExecutionEngine/MCJIT.h"
-#include "llvm/ExecutionEngine/SectionMemoryManager.h"
-#include "llvm/IR/DIBuilder.h"
-#include "llvm/IR/DataLayout.h"
-#include "llvm/IR/DerivedTypes.h"
-#include "llvm/IR/DebugInfo.h"
-#include "llvm/IR/IRBuilder.h"
-#include "llvm/IR/LLVMContext.h"
-#include "llvm/IR/LegacyPassManager.h"
-#include "llvm/IR/Module.h"
-#include "llvm/IR/Verifier.h"
-#include "llvm/Support/Host.h"
-#include "llvm/Support/TargetSelect.h"
-#include "llvm/Transforms/Scalar.h"
+#include "llvm_includes.h"
 
 #include "debuginfo/debuginfo_manager.h"
+#include "ast/ast.h"
 
 //===----------------------------------------------------------------------===//
 // Code Generation
@@ -53,7 +37,7 @@ llvm::Value *VariableExprAST::Codegen() {
 }
 
 Value *UnaryExprAST::Codegen() {
-  Value *OperandV = Operand->Codegen();
+  llvm::Value *OperandV = Operand->Codegen();
   if (OperandV == 0)
     return 0;
 
@@ -423,22 +407,26 @@ Function *PrototypeAST::Codegen() {
 
 // CreateArgumentAllocas - Create an alloca for each argument and register the
 // argument in the symbol table so that references to it will succeed.
-void PrototypeAST::CreateArgumentAllocas(Function *F) {
+void PrototypeAST::CreateArgumentAllocas(Function *F)
+{
   Function::arg_iterator AI = F->arg_begin();
-  for (unsigned Idx = 0, e = Args.size(); Idx != e; ++Idx, ++AI) {
+  for (unsigned Idx = 0, e = Args.size(); Idx != e; ++Idx, ++AI)
+  {
     // Create an alloca for this variable.
     AllocaInst *Alloca = CreateEntryBlockAlloca(F, Args[Idx].c_str() );
 
     // Create a debug descriptor for the variable.
-    DIScope *Scope = KSDbgInfo.LexicalBlocks.back();
+    DIScope *Scope = debug_manager::get_instance()->getLexicalBlocks()->back();
 
     auto Unit = DBuilder->createFile(
           debug_manager::get_instance()->getCU()->getFilename(),
           debug_manager::get_instance()->getCU()->getDirectory()
         );
+
+
     auto D = DBuilder->createLocalVariable(
-        dwarf::DW_TAG_arg_variable, *Scope, Args[Idx], Unit, Line,
-        *KSDbgInfo.getDoubleTy(), Idx);
+        dwarf::DW_TAG_arg_variable, *Scope, Args[Idx].c_str(), Unit, Line,
+        *debug_manager::get_instance()->getDoubleTy(), Idx);
 
     DBuilder->insertDeclare(
           Alloca,
@@ -463,16 +451,17 @@ Function *FunctionAST::Codegen() {
     return 0;
 
   // Push the current scope.
-  KSDbgInfo.LexicalBlocks.push_back(KSDbgInfo.FnScopeMap[Proto]);
+  debug_manager::get_instance()->addFunctionScopeToLexicalBlocks(Proto);
 
   // Unset the location for the prologue emission (leading instructions with no
   // location in a function are considered part of the prologue and the debugger
   // will run past them when breaking on a function)
-  KSDbgInfo.emitLocation(nullptr);
+  debug_manager::get_instance()->emitLocation(nullptr);
+
 
   // If this is an operator, install it.
   if (Proto->isBinaryOp())
-    BinopPrecedence[Proto->getOperatorName()] = Proto->getBinaryPrecedence();
+    binop::get_instance()->setPrecedence( Proto->getOperatorName(), Proto->getBinaryPrecedence() );
 
   // Create a new basic block to start insertion into.
   BasicBlock *BB = BasicBlock::Create(getGlobalContext(), "entry", TheFunction);
@@ -481,14 +470,14 @@ Function *FunctionAST::Codegen() {
   // Add all arguments to the symbol table and create their allocas.
   Proto->CreateArgumentAllocas(TheFunction);
 
-  KSDbgInfo.emitLocation(Body);
+  debug_manager::get_instance()->emitLocation(Body);
 
   if (Value *RetVal = Body->Codegen()) {
     // Finish off the function.
     Builder.CreateRet(RetVal);
 
     // Pop off the lexical block for the function.
-    KSDbgInfo.LexicalBlocks.pop_back();
+    debug_manager::get_instance()->getLexicalBlocks()->pop_back();
 
     // Validate the generated code, checking for consistency.
     verifyFunction(*TheFunction);
@@ -503,11 +492,11 @@ Function *FunctionAST::Codegen() {
   TheFunction->eraseFromParent();
 
   if (Proto->isBinaryOp())
-    BinopPrecedence.erase(Proto->getOperatorName());
+    binop::get_instance()->removePrecedence( Proto->getOperatorName() );
 
   // Pop off the lexical block for the function since we added it
   // unconditionally.
-  KSDbgInfo.LexicalBlocks.pop_back();
+  debug_manager::get_instance()->getLexicalBlocks()->pop_back();
 
   return 0;
 }

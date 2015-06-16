@@ -6,13 +6,15 @@
 #include <vector>
 
 #include "lex.h"
-#include "debug.h"
-#include "debug_manager.h"
+#include "debuginfo.h"
+#include "debuginfo_manager.h"
 
 
-debug_abs* get_instance()
+debug_info di;
+
+
+debug_abs* debug_manager::get_instance()
 {
-  static debug_info di;
   return (debug_abs*)&di;
 }
 

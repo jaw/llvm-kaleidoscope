@@ -1,21 +1,5 @@
-#include "llvm/ADT/STLExtras.h"
-#include "llvm/ADT/Triple.h"
-#include "llvm/Analysis/Passes.h"
-#include "llvm/ExecutionEngine/ExecutionEngine.h"
-#include "llvm/ExecutionEngine/MCJIT.h"
-#include "llvm/ExecutionEngine/SectionMemoryManager.h"
-#include "llvm/IR/DIBuilder.h"
-#include "llvm/IR/DataLayout.h"
-#include "llvm/IR/DerivedTypes.h"
-#include "llvm/IR/DebugInfo.h"
-#include "llvm/IR/IRBuilder.h"
-#include "llvm/IR/LLVMContext.h"
-#include "llvm/IR/LegacyPassManager.h"
-#include "llvm/IR/Module.h"
-#include "llvm/IR/Verifier.h"
-#include "llvm/Support/Host.h"
-#include "llvm/Support/TargetSelect.h"
-#include "llvm/Transforms/Scalar.h"
+#include "llvm_includes.h"
+
 #include <cctype>
 #include <cstdio>
 #include <iostream>
@@ -87,12 +71,13 @@ int main() {
   // Construct the DIBuilder, we do this here because we need the module.
   DBuilder = new DIBuilder(*TheModule);
 
+  debug_manager::get_instance()->setIRBuilder( &Builder );
+  debug_manager::get_instance()->setDBuilder( DBuilder );
+
   // Create the compile unit for the module.
   // Currently down as "fib.ks" as a filename since we're redirecting stdin
   // but we'd like actual source locations.
-  KSDbgInfo.TheCU = new DICompileUnit();
-  *KSDbgInfo.TheCU = DBuilder->createCompileUnit(
-      dwarf::DW_LANG_C, "fib.ks", ".", "Kaleidoscope Compiler", 0, "", 0);
+  debug_manager::get_instance()->init();
 
   // Create the JIT.  This takes ownership of the module.
   std::string ErrStr;
