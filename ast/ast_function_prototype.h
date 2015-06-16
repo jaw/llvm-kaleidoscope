@@ -62,6 +62,10 @@ public:
     return Precedence;
   }
 
+  /// prototype
+  ///   ::= id '(' id* ')'
+  ///   ::= binary LETTER number? (id, id)
+  ///   ::= unary LETTER (id)
   static ast_function_prototype* parse()
   {
     vsx_string<> FnName;

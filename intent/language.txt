@@ -1,0 +1,378 @@
+// Design ideas:
+//  - not possible to put the if statement and the resulting code on the same row
+//    this is why no semicolons needed at the end of each row
+//  - curly braces on rows of their own, makes sense when declaring 
+//    
+//  - thus not possible to put multiple operations on the same row which improves readability without being
+//    as rigid as python is when it comes to multiple-row statements easily breaking up
+// - to avoid if hell
+//    the "else" operator is not supported in this language. 
+//    It encourages bad code. 
+// - by keeping syntax simple, an editor can easily parse it and always know tab depth etc.
+//   for inspiration, see the LyX editor which enforces good behaviour of the writer
+
+// basic integers of various bit sizes, 
+// i1 is boolean
+i1
+i2
+i4
+i8
+i16
+i32  
+i64
+i128
+
+// to make them unsigned
+ui1
+ui2
+ui4
+ui8
+ui16
+ui32
+ui64
+ui128
+
+// floats of varying bit length
+f16
+f32
+f64
+f80
+f128
+
+// the iterator data type - an unsigned integer - depends on 32-bit or 64-bit platform
+iterator
+
+// in-language support for hex, binary and octal numbers
+0xFEEDBEEF
+0y11011101
+0755
+
+
+
+class string<T>
+{
+private:
+    data T(0)[auto]
+
+public:
+
+    op == (o string<T>)
+    {
+        foreach (data, i)
+	    if (o[i] != data[i])
+                return 0
+        return 1
+    }
+}
+
+class vec2<T>
+{
+    options:
+        align_bytes 64  // align these in memory to a 64 byte border (cache line)
+    x T = 0.0
+    y T = 0.0
+}
+
+
+class vec3<T> // template value (preprocessor)
+{ 
+    extend vec2 // copies vec2 into this class, not inheritance
+    
+    z T = 0.0
+    public normalize(param1 ui32) : // bla bla
+        ui32 result
+        ui64 error
+    {
+        return [[result = 1, error = 0]]
+    }
+    
+    // arithmetic operators
+    op + (vec3<T> o)
+    {
+        x = o.x
+        y = o.y
+        z = o.z
+    }
+    
+    op + (vec2<T> o)
+    {
+        x = o.x
+        y = o.y
+    }
+    
+    // boolean (i1) operators
+    op == (o vec3<T>):
+        result ui1
+    {
+        return true
+    }
+}
+
+class quat<T>
+{
+    extend vec3 // copies vec3 into this class, not inheritance
+    w T = 1.0
+}
+
+class color<T>
+{
+    extend vec3
+    
+    // give additional alias names to members
+    alias x = r
+    alias y = g
+    alias z = b
+    
+    a T = 1.0
+    
+    // this simply replaces the normalize of the vec3 compile-time, no run time huzzah
+    public normalize()
+    {
+        r = 1
+        g = 1
+        b = 1
+        a = 1
+    }
+}
+
+class stuff
+{
+    options: 
+        pack // here we request that the compiler packs this for us, no need for the ugly C++ warnings that say "you initialized things in the wrong order"
+        reorder // reorder 
+        align_bytes 64 // align to beginning of cache line
+    
+    a ui8 = 1
+    b ui32(2)
+    f ui2 = 0
+}
+
+class other_stuff<T,U>
+{
+    x T
+    y U
+    
+    constr
+    {
+        echo "constructed\n"
+    }
+    
+    destr
+    {
+        echo "destructed\n"
+    }
+    
+    op size
+    {
+        return 2
+    }
+    
+    op [i] :
+      result T
+    {
+        if (i == 0)
+            return x
+        if (i == 1)
+            return y
+        return y
+    }
+}
+
+class matrix4x4<T>
+{
+public:
+    m T[16]
+    
+    transpose() 
+    {
+        m[0] = m[0]
+        m[1] = m[4]
+        m[2] = m[8]
+        m[3] = m[12]
+        m[4] = m[1]
+        m[5] = m[5]
+        m[6] = m[9]
+        m[7] = m[13]
+        m[8] = m[2]
+        m[9] = m[6]
+        m[10] = m[10]
+        m[11] = m[14]        
+        m[12] = m[3]
+        m[13] = m[7]
+        m[14] = m[11]
+        m[15] = m[15]
+    }
+}
+
+class mesh<VT,VQ>
+{
+public:
+    vertices   vec3<VT>(0.0, 0.0, 0.0)[auto]
+    normals    vec3<VT>(0.0, 0.0, 1.0)[auto]
+    uvs        vec2<VT>[auto]
+    rotation   quat<VQ>[auto]
+    vertex_ptr vec3<f64>* = NULL
+    counts     ui32(0)[8]
+    someone_elses_data  vec3<f128>* NULL 
+    
+    lambda_function_holder ()
+        result vec3<VT> 
+        count ui64
+        error ui64
+      
+    other_lambda_function_holder (param1 ui64, param2 string)
+        result vec3<VT> 
+        count ui64
+        error ui64
+
+    some_method ()
+      return_value i8
+      error_code i8 = 0
+    {
+    }
+
+    
+
+    add_all_normals ()
+        result vec3<VT> // a return value, this contains all values added together
+        count ui64 // a return value, this will contain how many elements we added together
+        error ui64
+    { // compiler enforces that this is on a row of its own
+        
+        var i8 = some_method()
+        return_val i8
+        [i8, return_val] = some_method()
+	if (return_val == 0)
+		
+
+        if (!vertices.count)
+            return
+            
+        foreach (vertices)
+        {
+            result += *vertices
+            count++
+        }
+
+        foreach (vertices)   
+        {    // enforce that this is on a row of its own
+            result += *vertices // here we renamed the iterator integer
+            count++
+        } // enforce that this is on a row of its own
+
+        // here, only one statement is run inside the loop, thus no need for {}
+        foreach (vertices)
+            *vertices.do_something()
+    }
+
+    compact_function_with_return_values () result1 ui64[], result2 ui64
+    { return [[1,2]] }
+
+    compact_function_without_return_values () { do_something() }
+
+
+    init_our_lambda ()
+    {
+        lambda_function_holder = add_all_normals
+    }
+}
+
+
+calculate ()
+{
+    m mesh<f64,f32>
+
+    // this might be problematic but maybe a cool idea
+    m.{vertices, normals, uvs}.allocate(1000) // allocates without running "constructor"
+    
+    // if they were integers, you could have done this:
+    m.{vertices, normals, uvs} = 1
+    
+    // old, normal way of doing it
+    m.vertices.allocate(1000)
+    m.normals.allocate(1000)
+    m.uvs.allocate(1000)
+    
+    m.vertices.init() // initializes all values to the constructed value specified in mesh
+    m.normals.init( y = 1.0 ) // only y will be set
+    m.rotation.init(1.0, 0.0, 0.0, 0.0) // all 4 variables in order will be constructed with these values
+    
+    // print size of mesh in memory
+    echo m.sizeof()
+
+    var1 ui64
+
+    // single equals forbidden in "if" statements
+    if ( var1 == 1 )
+        var1 = 2
+
+    // bitwise ops
+    if ( var1 and 4 || var1 and 8 )
+	var1 = 0
+    
+    // this following initializes a vec3 without wasting cycles to set its default values:
+    v vec3<f32>()[]
+    
+    // since we are going to set them here anyway
+    v.x = 1.0
+    v.y = 0.0
+    v.z = 0.0
+
+    // function definition:
+    //
+    // name (param1 type1, param2 type2, ... )
+    //    [ capture1, capture2, ... ] 
+    //    :
+    //    return_value_1 type1 = default_value
+    // { 
+    //   ...
+    // }
+
+    local_function () 
+       result1 ui32
+       error ui32 = 0
+       :
+       var1
+       m
+    {
+	m.do_stuff()
+	if (m.is_something())
+            return 0
+    }
+    local_function()
+
+    
+    // this here initializes another vector with the default values:
+    u vec3<f32>()
+
+
+    // anonymous function, runs instantly
+    {{
+        if (!m.vertices.size())
+            break
+        
+        if (a and 2)
+            do_stuff()
+        
+        i ui16
+        
+        create_sub ()
+        {
+            if ( something_wrong() )
+                return
+            i = 2
+            
+            do_something()
+        }
+
+        create_sub2 ()
+        {
+            if (something_else_wrong())
+                return
+            
+            do_something_else()
+        }
+    }}
+
+    
+}
